@@ -1,226 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1976d2">
-    <title>My Todos - Offline Task Manager</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Beautiful offline todo app with recurring tasks">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="My Todos">
-    
-    <!-- Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Todos - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Header -->
-        <header class="app-header">
-            <h1>My Todos</h1>
-            <div class="header-actions">
-                <button class="icon-btn" id="searchBtn" aria-label="Search">
-                    <span class="material-icons">search</span>
-                </button>
-                <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">
-                    <span class="material-icons">dark_mode</span>
-                </button>
-                <button class="icon-btn" id="settingsBtn" aria-label="Settings">
-                    <span class="material-icons">settings</span>
-                </button>
-            </div>
-        </header>
+    <h1>Todo App Test</h1>
+    <button onclick="testClick()">Test Button - Click Me!</button>
+    <button id="jsButton">JS Event Listener Button</button>
+    <div id="output">Waiting for clicks...</div>
 
-        <!-- Search Bar -->
-        <div id="searchBar" class="search-bar hidden">
-            <input type="text" id="searchInput" placeholder="Search tasks..." autocomplete="off">
-            <button class="icon-btn" id="closeSearchBtn">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Active Tasks -->
-            <section class="task-section">
-                <h2 class="section-title">Active Tasks</h2>
-                <div id="activeTasks" class="task-list">
-                    <!-- Tasks will be inserted here -->
-                </div>
-            </section>
-
-            <!-- Completed Tasks -->
-            <section class="task-section">
-                <h2 class="section-title">Completed Tasks</h2>
-                <div id="completedTasks" class="task-list">
-                    <!-- Completed tasks will be inserted here -->
-                </div>
-            </section>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="empty-state hidden">
-                <div class="empty-icon">📝</div>
-                <h3>No tasks yet!</h3>
-                <p>Tap the + button to add your first task</p>
-            </div>
-        </main>
-
-        <!-- FAB -->
-        <button class="fab" id="addTaskBtn" aria-label="Add task">
-            <span class="material-icons">add</span>
-        </button>
-
-        <!-- Task Dialog -->
-        <div id="taskDialog" class="dialog hidden">
-            <div class="dialog-content">
-                <div class="dialog-header">
-                    <h2 id="dialogTitle">Add Task</h2>
-                    <button class="icon-btn" id="closeDialogBtn">
-                        <span class="material-icons">close</span>
-                    </button>
-                </div>
-                
-                <form id="taskForm" class="task-form">
-                    <!-- Title -->
-                    <div class="form-group">
-                        <label for="taskTitle">Title *</label>
-                        <input type="text" id="taskTitle" required autocomplete="off">
-                    </div>
-
-                    <!-- Description -->
-                    <div class="form-group">
-                        <label for="taskDescription">Description</label>
-                        <textarea id="taskDescription" rows="3"></textarea>
-                    </div>
-
-                    <!-- Due Date/Time -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="taskDate">Due Date</label>
-                            <input type="date" id="taskDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="taskTime">Time</label>
-                            <input type="time" id="taskTime">
-                        </div>
-                    </div>
-
-                    <!-- Priority -->
-                    <div class="form-group">
-                        <label for="taskPriority">Priority</label>
-                        <select id="taskPriority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-
-                    <!-- Tags -->
-                    <div class="form-group">
-                        <label>Tags</label>
-                        <div class="tag-input-container">
-                            <input type="text" id="tagInput" placeholder="Add tag and press Enter">
-                            <div id="tagList" class="tag-list"></div>
-                        </div>
-                    </div>
-
-                    <!-- Subtasks -->
-                    <div class="form-group">
-                        <label>Subtasks</label>
-                        <button type="button" class="btn-secondary" id="addSubtaskBtn">
-                            <span class="material-icons">add</span> Add Subtask
-                        </button>
-                        <div id="subtaskList" class="subtask-list"></div>
-                    </div>
-
-                    <!-- Recurring -->
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="recurringCheckbox">
-                            <span>Make this recurring</span>
-                        </label>
-                    </div>
-
-                    <div id="recurringOptions" class="recurring-options hidden">
-                        <div class="form-group">
-                            <label for="recurringFrequency">Frequency</label>
-                            <select id="recurringFrequency">
-                                <option value="minutes">Minutes</option>
-                                <option value="hours">Hours</option>
-                                <option value="days">Days</option>
-                                <option value="weeks">Weeks</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                            </select>
-                        </div>
-
-                        <div id="frequencyOptions" class="frequency-options">
-                            <!-- Dynamic content based on frequency -->
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="dialog-actions">
-                        <button type="button" class="btn-text" id="cancelBtn">Cancel</button>
-                        <button type="submit" class="btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Settings Dialog -->
-        <div id="settingsDialog" class="dialog hidden">
-            <div class="dialog-content small">
-                <div class="dialog-header">
-                    <h2>Settings</h2>
-                    <button class="icon-btn" id="closeSettingsBtn">
-                        <span class="material-icons">close</span>
-                    </button>
-                </div>
-                
-                <div class="settings-content">
-                    <div class="setting-item">
-                        <span>Enable Notifications</span>
-                        <label class="switch">
-                            <input type="checkbox" id="notificationsToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-item">
-                        <span>Sort By</span>
-                        <select id="sortBy">
-                            <option value="creation">Creation Date</option>
-                            <option value="dueDate">Due Date</option>
-                            <option value="priority">Priority</option>
-                            <option value="alphabetical">Alphabetical</option>
-                        </select>
-                    </div>
-                    
-                    <button class="btn-secondary full-width" id="exportBtn">
-                        <span class="material-icons">download</span> Export Tasks
-                    </button>
-                    
-                    <button class="btn-danger full-width" id="clearAllBtn">
-                        <span class="material-icons">delete</span> Clear All Tasks
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
+    <script>
+        // Inline script to test
+        console.log('Inline script loaded');
+        document.getElementById('output').innerHTML = 'JavaScript is working!';
+        
+        function testClick() {
+            alert('Button clicked! JavaScript works!');
+            document.getElementById('output').innerHTML = 'Button was clicked at ' + new Date().toLocaleTimeString();
+        }
+        
+        // Test event listener
+        document.getElementById('jsButton').addEventListener('click', function() {
+            alert('Event listener works!');
+        });
+    </script>
 </body>
 </html>
