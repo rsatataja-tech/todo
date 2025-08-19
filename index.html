@@ -1,47 +1,250 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Todos - Test</title>
+    <title>My Todos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: #1976d2;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
         }
-        button {
-            padding: 10px 20px;
+        
+        .task-input {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .task-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             font-size: 16px;
-            margin: 10px;
+        }
+        
+        .task-input button {
+            padding: 10px 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .task-input button:hover {
+            background: #1565c0;
+        }
+        
+        .task {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .task.completed {
+            opacity: 0.7;
+        }
+        
+        .task.completed .task-text {
+            text-decoration: line-through;
+        }
+        
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
             cursor: pointer;
         }
-        #output {
-            margin-top: 20px;
-            padding: 10px;
-            background: #f0f0f0;
+        
+        .task-text {
+            flex: 1;
+        }
+        
+        .task-delete {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        /* Dark theme */
+        body.dark {
+            background: #303030;
+            color: #fff;
+        }
+        
+        body.dark .task {
+            background: #424242;
+        }
+        
+        body.dark .task-input input {
+            background: #424242;
+            color: white;
+            border-color: #555;
         }
     </style>
 </head>
 <body>
-    <h1>Todo App Test</h1>
-    <button onclick="testClick()">Test Button - Click Me!</button>
-    <button id="jsButton">JS Event Listener Button</button>
-    <div id="output">Waiting for clicks...</div>
+    <div class="header">
+        <h1>My Todos</h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span class="material-icons">dark_mode</span>
+        </button>
+    </div>
+    
+    <div class="container">
+        <div class="task-input">
+            <input type="text" id="taskInput" placeholder="What needs to be done?" onkeypress="handleKeyPress(event)">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        
+        <div id="taskList"></div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>No tasks yet!</h3>
+            <p>Add a task to get started</p>
+        </div>
+    </div>
 
     <script>
-        // Inline script to test
-        console.log('Inline script loaded');
-        document.getElementById('output').innerHTML = 'JavaScript is working!';
+        // State
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        let theme = localStorage.getItem('theme') || 'light';
         
-        function testClick() {
-            alert('Button clicked! JavaScript works!');
-            document.getElementById('output').innerHTML = 'Button was clicked at ' + new Date().toLocaleTimeString();
+        // Initialize
+        document.body.className = theme;
+        renderTasks();
+        
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const task = {
+                    id: Date.now(),
+                    text: text,
+                    completed: false
+                };
+                
+                tasks.unshift(task);
+                saveTasks();
+                renderTasks();
+                input.value = '';
+            }
         }
         
-        // Test event listener
-        document.getElementById('jsButton').addEventListener('click', function() {
-            alert('Event listener works!');
-        });
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        }
+        
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        }
+        
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            taskList.innerHTML = tasks.map(task => `
+                <div class="task ${task.completed ? 'completed' : ''}">
+                    <input type="checkbox" 
+                           class="task-checkbox" 
+                           ${task.completed ? 'checked' : ''} 
+                           onchange="toggleTask(${task.id})">
+                    <span class="task-text">${escapeHtml(task.text)}</span>
+                    <button class="task-delete" onclick="deleteTask(${task.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+        
+        function toggleTheme() {
+            theme = theme === 'light' ? 'dark' : 'light';
+            document.body.className = theme;
+            localStorage.setItem('theme', theme);
+            
+            const icon = document.querySelector('.theme-toggle .material-icons');
+            icon.textContent = theme === 'light' ? 'dark_mode' : 'light_mode';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Test
+        console.log('App loaded successfully!');
     </script>
 </body>
 </html>
